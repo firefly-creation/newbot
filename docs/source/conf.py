@@ -6,13 +6,6 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-import os
-import sys
-sys.path.insert(0, os.path.abspath('../..'))  # 将项目根目录添加到模块查找路径中去
-
-
-
-
 project = 'newbot'
 copyright = '2024, luowei'
 author = 'luowei'
@@ -22,8 +15,8 @@ release = '1.3.0'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode',
+    'recommonmark',
+    'sphinx_markdown_tables'
 ]
 
 templates_path = ['_templates']
