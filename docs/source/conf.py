@@ -14,12 +14,7 @@ release = '1.3.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['sphinx.ext.imgmath',
-             'sphinx.ext.todo',
-             'sphinx.ext.autosectionlabel',
-             'sphinx.ext.autosummary',
-             'sphinx.ext.autodoc'，
-             'recommonmark']
+extensions = []
 
 templates_path = ['_templates']
 exclude_patterns = []
@@ -31,7 +26,3 @@ language = 'zh_CN'
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
-
-numfig = True
-source_suffix = ['.rst', '.md']
-
