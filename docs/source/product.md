@@ -10,47 +10,67 @@
 
 不论是科技爱好者还是编程小白，小白机器人都能带给您无尽的学习机会和乐趣。
 
+
+
 # 二、产品外观
 
 ![xiaobai](imgs/xiaobai.jpg)
+
+
 
 # 三、适用人群
 
 ![user](imgs/user.png)
 
+
+
 # 四、市面产品问题
 
 ![question](imgs/question.png)
+
+
 
 # 五、本产品亮点
 
 ![highlight](imgs/highlight.png)
 
+
+
 # 六、硬件规格
 
-| 项目         | 参数                                                         |
-| ------------ | ------------------------------------------------------------ |
-| 主芯片SOC    | Rockchip RK3566                                              |
-| CPU          | 四核64位Cortex-A55 1.8GHz                                    |
-| NPU          | 1T算力 支持TensorFlow/ONNX/PyTorch模型转换                   |
-| VPU          | 4K@60fps H.265/H.264/VP9 视频解码 1080P@60fps H.265/H.264 视频编码 |
-| RAM          | LPDDR4 2GB                                                   |
-| ROM          | eMMC 32GB                                                    |
-| Wi-Fi+蓝牙   | Wi-Fi 5+BT 5.0,BLE(20U5622)                                  |
-| 控制芯片MCU  | STM32F103C8T6                                                |
-| 电池容量     | 7000mAh 3.7V                                                 |
-| 机器人尺寸   | 直径12cm 高度约10cm                                          |
-| 摄像头分辨率 | 1280x800 30FPS                                               |
-| 屏幕尺寸     | 1.28寸SPI圆形屏幕                                            |
-| 操作系统     | Ubuntu20.04 桌面版                                           |
+|     项目     |                    参数                    |
+| :----------: | :----------------------------------------: |
+|   产品型号   |                 newbot1.0                  |
+|  主芯片SOC   |              Rockchip RK3566               |
+|     CPU      |         四核64位Cortex-A55 1.8GHz          |
+|     NPU      | 1T算力 支持TensorFlow/ONNX/PyTorch模型转换 |
+|     VPU      |         H.265/H.264/JPEG硬件编解码         |
+|     RAM      |                 LPDDR4 2GB                 |
+|     ROM      |                 eMMC 32GB                  |
+|  Wi-Fi+蓝牙  |        Wi-Fi 5+BT 5.0,BLE(20U5622)         |
+| 控制芯片MCU  |               STM32F103C8T6                |
+|   电池容量   |                7000mAh 3.7V                |
+|  机器人尺寸  |            直径12cm 高度约10cm             |
+| 摄像头分辨率 |               1280x800 30FPS               |
+|   屏幕尺寸   |             1.28寸SPI圆形屏幕              |
+|   操作系统   |                Ubuntu20.04                 |
+|   ROS版本    |                ROS1 Noetic                 |
+
+
+
+
 
 # 七、硬件框图
 
 ![hardware](imgs/hardware.png)
 
+
+
 # 八、主要软件功能
 
 ![software](imgs/software.png)
+
+
 
 # 九、产品功能概览
 
@@ -96,7 +116,7 @@ SOC主板集成高速WIFI，适用于实时传输图像
 
 支持通过语音命令控制机器人移动和旋转
 
-支持显示机器人状态
+支持显示机器人状态，如温度、电压等参数
 
 支持设置机器人眼睛颜色
 
@@ -193,4 +213,22 @@ APP支持打印任意话题
 APP支持按钮发布BOOL话题
 
 APP支持SSH远程连接
+
+
+
+# 十、发货清单
+
+小白机器人本体
+
+螺丝刀
+
+ST-LINK烧录器，用于修改STM32源码
+
+串口模块，用于修改离线语音芯片源码
+
+
+
+# 十一、注意事项
+
+本产品属于开源学习套件，外壳采用光固化3D打印，存在少量瑕疵，介意者请勿拍
 
