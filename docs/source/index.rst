@@ -15,6 +15,12 @@
 
 .. toctree::
    :maxdepth: 1
+   :caption: 二次开发
+   
+   how_to_develop
+   
+.. toctree::
+   :maxdepth: 1
    :caption: 常见问题
    
    question
