@@ -19,6 +19,13 @@
    
    how_to_develop
    
+
+.. toctree::
+   :maxdepth: 1
+   :caption: 组装说明
+   
+   how_to_assemble
+   
 .. toctree::
    :maxdepth: 1
    :caption: 常见问题
