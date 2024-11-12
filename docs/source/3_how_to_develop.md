@@ -6,7 +6,7 @@
 
 2.在唤醒状态下，向小白机器人说“显示IP地址”，小白机器人屏幕会显示出当前IP地址；
 
-3.在windows或者ubuntu系统（推荐使用ubuntu系统开发）的电脑上打开命令行输入：
+3.在windows或者ubuntu系统（推荐使用ubuntu系统开发）的电脑上打开终端输入：
 
 ```shell
 $ ssh orangepi@192.168.xx.xx
@@ -56,7 +56,7 @@ killall rosmaster #关闭roscore并且所有节点也会跟着关闭
 在关闭开机启动的ROS程序之后，进入板子主目录下的newbot_ws目录（如果板子重新刷机或者系统丢失，联系客服提供代码资料），执行如下命令手动启动ROS程序：
 
 ```shell
-killall rosmaster #如果没有按上一步关闭后台程序，用此命令关闭
+killall rosmaster #一定要先关闭开机启动的ROS程序
 cd ~/newbot_ws/
 source devel/setup.bash
 roslaunch pkg_launch all.launch
@@ -75,12 +75,16 @@ HOST_IP=$(hostname -I | awk '{print $1}')
 export ROS_IP=$HOST_IP
 export ROS_HOSTNAME=$HOST_IP
 export ROS_MASTER_URI=http://$HOST_IP:11311
+#以下环境变量三选一
+export LIDAR_TYPE=YDLIDAR    #雷达顶部有两颗螺丝
+export LIDAR_TYPE=M1C1_MINI  #雷达顶部有三颗螺丝
+export LIDAR_TYPE=M1C1_MINI_TTYUSB #雷达顶部有三颗螺丝，但是数据线接到USB接口的（目前发售的没有这款）
 ```
 
 电脑上需要配置多机通信，编辑电脑上的~/.bashrc文件：
 
 ```shell
-$ gedit ~/.bashrc #编辑~/.bashrc文件，增加内容如下
+$ gedit ~/.bashrc #编辑~/.bashrc文件，增加内容如下：
 HOST_IP=$(hostname -I | awk '{print $1}')
 export ROS_IP=$HOST_IP
 export ROS_HOSTNAME=$HOST_IP
@@ -103,7 +107,7 @@ ubuntu电脑上执行如下命令，开启NFS服务，windows系统可以查询�
 ```shell
 $ sudo apt install nfs-kernel-server
 $ sudo gedit /etc/exports
-末尾增加一行：/home/xxx/workspace/nfs *(rw,sync,no_root_squash)
+末尾增加一行：/home/xxx/workspace/nfs *(rw,sync,no_root_squash) #根据自己为电脑定义的nfs路径修改
 $ showmount -e localhost
 ```
 
@@ -114,15 +118,15 @@ ssh orangepi@板子ip地址
 sudo apt update
 sudo apt install nfs-common
 mkdir ~/nfs
-sudo mount -t nfs -o nolock 192.168.xx.xx:/home/xxx/workspace/nfs ~/nfs
-#这里修改为电脑的IP地址和NFS共享目录，例如：
-sudo mount -t nfs -o nolock 192.168.31.113:/home/luowei/workspace/nfs ~/nfs
+sudo mount -t nfs -o nolock 192.168.xx.xx:/home/xxxx/xxxx/nfs ~/nfs
+#这里修改为自己电脑的IP地址和NFS共享目录，例如：
+sudo mount -t nfs -o nolock 192.168.1.142:/home/xxx/workspace/nfs ~/nfs
 ```
 
 挂载成功后，在板子上运行如下命令可以将板子上的代码拷贝到电脑上修改，或者直接用资料中提供的代码放在电脑NFS目录中：
 
 ```shell
-cp -rv ~/newbot_ws ~/nfs/newbot/newbot_ws
+cp -rv ~/newbot_ws ~/nfs/newbot/newbot_ws #修改为自己电脑NFS共享目录
 ```
 
 
@@ -132,18 +136,17 @@ cp -rv ~/newbot_ws ~/nfs/newbot/newbot_ws
 代码开发过程可以在NFS共享目录中编译，最终部署到~/newbot_ws目录编译，开机会自动启动~/newbot_ws中的代码。
 
 ```shell
-cd ~/nfs/newbot/newbot_ws #如果编译NFS共享目录里的开发代码，则进入~/nfs/newbot/newbot_ws目录
+cd ~/nfs/xxx/newbot_ws #如果编译NFS共享目录里的开发代码，则进入~/nfs/xxx/newbot_ws目录
 #cd ~/newbot_ws           #如果是编译本地的部署代码，则进入~/newbot_ws目录
-#catkin_make --pkg ai_msgs #先编译这个包，不然可能会报错
-#catkin_make #第一次运行前如果没编译需要编译
-catkin_make --pkg ai_msgs && catkin_make #上面两条命令可以合并到一起执行
+killall rosmaster #编译之前要关闭ROS程序，防止内存不够用(c++: fatal error: Killed signal terminated program cc1plus)
+catkin_make #如果内存还是不够编译的时候输入catkin_make -j1或catkin_make -j2
 ```
 
 
 
-# 七、如何使用VNC远程桌面
+# 七、如何使用远程桌面
 
-如果对以上共享目录的方案和Linux命令行不太熟悉，可以安装VNC远程桌面，在图形界面中直接修改~/newbot_ws目录下的代码进行开发。
+## 1.tightvnc
 
 在开发板上输入vncserver启动VNC服务：
 
@@ -179,7 +182,7 @@ unset DBUS_SESSION_BUS_ADDRESS
 startxfce4 &
 openbox-session &
 
-#编辑完成后再次启动vncsever
+#编辑~/.vnc/xstartup完成后再次启动vncsever
 sudo chmod +x xstartup #添加xstartup的执行权限
 vncserver #会打印如下log
 
@@ -192,6 +195,58 @@ Log file is /home/orangepi/.vnc/orangepi3b:2.log
 在电脑上启动VNC Viewer客户端，输入ip地址:2或者orangepi.local:2远程连接开发板桌面，并且输入刚才设置好的远程密码，打开后在电脑上看到如下界面，说明远程桌面配置成功。
 
 ![vnc](imgs/vnc.png)
+
+## 2.x11vnc
+
+安装方法：
+
+```shell
+sudo apt install x11vnc
+x11vnc -storepasswd #创建连接密码，密码默认保存在/home/xxx/.vnc/passwd文件中
+#打开远程桌面：
+export DISPLAY=:0
+#x11vnc -auth guess -once -loop -noxdamage -repeat -rfbauth /home/xxx/.vnc/passwd -rfbport 5900 -shared
+#对于香橙派来说，上述命令修改为：
+x11vnc -auth guess -once -loop -noxdamage -repeat -rfbauth /home/orangepi/.vnc/passwd -rfbport 5900 -shared
+```
+
+设置开机自启：
+
+```shell
+sudo vim /etc/systemd/system/x11vnc.service #修改该文件内容如下：
+
+[Unit]
+Description=x11vnc (Remote access)
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/x11vnc -auth guess -display :0 -rfbauth /home/orangepi/.vnc/passwd -rfbport 5900 -forever -loop -noxdamage -repeat -shared -capslock -nomodtweak
+ExecStop=/bin/kill -TERM $MAINPID
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=control-group
+Restart=on-failure
+
+[Install]
+WantedBy=graphical.target
+
+#文件创建成功以后，使用以下命令重新读取系统服务配置，将x11vnc.service加入系统服务并开启
+sudo systemctl daemon-reload
+sudo systemctl enable x11vnc
+sudo systemctl start x11vnc
+```
+
+## 3.使用向日葵arm版或者todesk arm版本
+
+向日葵下载地址：
+
+https://sunlogin.oray.com/download/linux?type=personal&ici=sunlogin_navigation
+
+todesk下载地址：
+
+https://www.todesk.com/linux.html
+
+**注意：一定要下载安装arm64版本**
 
 
 
@@ -237,11 +292,13 @@ $ roslaunch pkg_launch rviz.launch #可视化建图和导航效果，并且能�
 
 # 九、重刷系统
 
-目前默认镜像：Orangepi3b_1.0.6_ubuntu_focal_desktop_xfce_linux5.10.160.7z
+目前默认镜像：Orangepi3b_1.0.6_ubuntu_focal_desktop_xfce_linux5.10.160.7z    1.1G    2024-04-25 10:33
 
-香橙派官网下载地址：[香橙派3B资料下载](http://www.orangepi.cn/html/hardWare/computerAndMicrocontrollers/service-and-support/Orange-Pi-3B.html)
+镜像下载地址：https://pan.baidu.com/share/init?surl=J_chiuD5biO6LD9qVKSV1Q&pwd=eexj
 
-可以根据香橙派3B官方的用户手册.pdf重刷系统。
+香橙派官网资料下载地址：[香橙派3B资料下载](http://www.orangepi.cn/html/hardWare/computerAndMicrocontrollers/service-and-support/Orange-Pi-3B.html)
+
+可以根据香橙派3B官方的用户手册pdf重刷系统。
 
 
 
@@ -263,7 +320,8 @@ sudo apt update
 sudo apt install -y nfs-common avahi-daemon
 mkdir ~/nfs
 #注意事项：这里修改为自己电脑的IP地址和NFS路径
-sudo mount -t nfs -o nolock 192.168.31.113:/home/xxx/workspace/nfs ~/nfs
+#sudo mount -t nfs -o nolock 192.168.xx.xx:/home/xxxx/xxxx/nfs ~/nfs
+sudo mount -t nfs -o nolock 192.168.1.142:/home/luowei/workspace/nfs ~/nfs
 
 #2.配置avahi-daemon服务
 #注意事项：一个局域网不能同时有多个orangepi.local设备
@@ -293,28 +351,39 @@ fi
 if ! grep -q "export ROS_MASTER_URI=http://\$HOST_IP:11311" ~/.bashrc; then
 	echo "export ROS_MASTER_URI=http://\$HOST_IP:11311" >> ~/.bashrc
 fi
+#注意事项：这里如果雷达顶部有两颗螺丝，则写入YDLIDAR；如果雷达顶部有三颗螺丝，则写入M1C1_MINI
+#这个配置要在start.sh中也要配置一遍，并且配置要一致
+#要么写入YDLIDAR
+#if ! grep -q "export LIDAR_TYPE=YDLIDAR" ~/.bashrc; then
+#	echo "export LIDAR_TYPE=YDLIDAR" >> ~/.bashrc
+#fi
+#要么写入M1C1_MINI
+if ! grep -q "export LIDAR_TYPE=M1C1_MINI" ~/.bashrc; then
+	echo "export LIDAR_TYPE=M1C1_MINI" >> ~/.bashrc
+fi
+
 source ~/.bashrc
 
 #4.安装常用的ROS包
-sudo apt install -y ros-noetic-teleop-twist-keyboard ros-noetic-move-base-msgs ros-noetic-move-base ros-noetic-map-server ros-noetic-base-local-planner ros-noetic-dwa-local-planner ros-noetic-teb-local-planner ros-noetic-global-planner ros-noetic-gmapping ros-noetic-amcl
+sudo apt install -y ros-noetic-teleop-twist-keyboard ros-noetic-move-base-msgs ros-noetic-move-base ros-noetic-map-server ros-noetic-base-local-planner ros-noetic-dwa-local-planner ros-noetic-teb-local-planner ros-noetic-global-planner ros-noetic-gmapping ros-noetic-amcl libudev-dev
 
 #5.安装EAI YDLidar库
-cd ~/nfs/newbot/newbot_ws #注意事项：修改为自己的NFS目录
-cd src/ydlidar/YDLidar-SDK
+#cd ~/nfs/xxx/newbot_ws/src/lidar_sensors/ydlidar/YDLidar-SDK #注意事项：修改为自己的NFS目录
+cd ~/nfs/newbot/newbot_ws_v1.1/newbot_ws/src/lidar_sensors/ydlidar/YDLidar-SDK
 #mkdir build 
 cd build
 #cmake ..
-#make -j #如果已经编译过了不用再编译
-sudo make install
+#make -j #注意：如果已经编译过了不用再编译，编译报错需要删除build文件夹和CMakeCache.txt
+sudo make install #编译过了只需安装，如果报错需要重新编译
 sync #把所有数据从内存缓冲区同步到硬盘
 
 #6.安装常用的python包
 export PATH=$PATH:/home/orangepi/.local/bin #防止安装python包时候的WARNING: The script read_zbar is installed in '/home/orangepi/.local/bin' which is not on PATH.
-sudo apt install -y python3-pip python3-websocket python3-pyaudio libsox-fmt-mp3 libatlas-base-dev espeak sox
+sudo apt install -y python3-pip python3-websocket python3-pyaudio libsox-fmt-mp3 libatlas-base-dev espeak sox #后面几个是音频相关的依赖包
 pip config set global.index-url https://pypi.mirrors.ustc.edu.cn/simple
 pip install -U pip
 
-pip install opencv-python
+pip install opencv-python #这个报错不用管:ERROR: opencv-python 4.10.0.84 has requirement numpy>=1.19.3; but you'll have numpy 1.17.4 which is incompatible.
 pip install sherpa_onnx
 
 pip install pulsectl
@@ -325,8 +394,11 @@ pip install pyzbar
 
 pip install gpio
 pip install python-periphery
-pip install pyserial
 
+pip install sounddevice
+pip install httpx
+pip install pycryptodome #对应代码:from Crypto.Cipher import AES
+pip install pytz
 
 #7.配置音频设备和音量
 #这两个命令查看默认设备，前面有星号的代表默认：
@@ -340,42 +412,41 @@ sudo apt install -y pulseaudio
 pacmd list-sinks | grep -e 'index:' -e 'name:'
 pacmd list-sources | grep -e 'index:' -e 'name:'
 #这个命令配置在重启后可能会变化，加入启动脚本
+pactl set-default-sink "alsa_output.platform-rk809-sound.stereo-fallback"
 pactl set-default-source "alsa_input.usb-C-Media_Electronics_Inc._USB_PnP_Sound_Device-00.mono-fallback"
 pacmd list-sinks | grep -e 'index:' -e 'name:'
 pacmd list-sources | grep -e 'index:' -e 'name:'
-
-#设置USB麦克风的捕获强度，注意：这个会影响采集的录音的幅度，必须设置到100%！！！
-#这句命令必须麦克风插上运行才有作用，所以写入启动脚本或者程序更合适
-amixer -c 2 sset Mic 100%
-
-#设置音量
-pactl set-sink-volume 1 100%
-
+#设置喇叭音量
+pactl set-sink-volume "alsa_output.platform-rk809-sound.stereo-fallback" 100%
+#设置USB麦克风的捕获强度，范围0~16
+amixer -c 2 sset Mic 16
 
 #8.拷贝应用程序和启动脚本，解压和编译
-cd ~/nfs/newbot #注意事项：修改为自己的NFS目录
-cp -rv newbot_ws.zip ~ #拷贝newbot_ws.zip压缩包到板子根目录
+#cd ~/nfs/xxx #注意事项：修改为自己的NFS目录
+cd ~/nfs/newbot/newbot_ws_v1.1
+cp -rv newbot_ws.zip ~ #拷贝newbot_ws.zip压缩包到板子根目录，注意提前做好压缩包放在NFS目录中
 sudo cp -rv newbot_ws/src/config/rc.local  /etc
 sudo cp -rv newbot_ws/src/config/*v2*      /boot/dtb/rockchip
 sync #把所有数据从内存缓冲区同步到硬盘
 
 #解压文件
 cd ~
-rm -r newbot_ws #删除原有程序
+rm -r newbot_ws #删除原有程序，注意备份防止误删
 unzip newbot_ws.zip
 sync #把所有数据从内存缓冲区同步到硬盘
 
 #如果没有正确编译按照如下命令编译
 #cd ~/newbot_ws
 #source /opt/ros/noetic/setup.bash
-#rosnode kill -a #编译之前要关闭ROS程序，防止内存不够用
-#killall rosmaster
+#rosnode kill -a
+#killall rosmaster #编译之前要关闭ROS程序，防止内存不够用(c++: fatal error: Killed signal terminated program cc1plus)，如果内存还是不够编译的时候输入catkin_make -j1或catkin_make -j2
 #rm devel build #如果已经编译正确则不用删除和编译
-#catkin_make --pkg ai_msgs && catkin_make #如果已经编译正确可以不再编译
-#cp -rv build/ devel/ ~/nfs/newbot/newbot_ws #把结果复制到电脑一份方便烧录下一个板子 #注意事项：修改为自己的NFS目录
+#catkin_make --pkg ai_msgs && catkin_make
+#catkin_make #Cmakelist.txt里面加了add_dependencies(${PROJECT_NAME} ai_msgs_generate_messages_cpp)之后只需直接输入catkin_make，不用先编译ai_msgs
+#cp -rv build/ devel/ ~/nfs/newbot/newbot_ws_v1.1/newbot_ws #把结果复制到电脑一份方便烧录下一个板子 #注意事项：修改为自己的NFS目录
 #sync #把所有数据从内存缓冲区同步到硬盘
 
-#9.配置SPI3和UART2,9使能
+#9.配置SPI3和UART2,9使能，注意：UART2使能之后，串口调试功能会失效，只能通过网络或屏幕连接
 if ! grep -q "overlays=spi3-m0-cs0-spidev uart2-m0 uart9-m2" /boot/orangepiEnv.txt; then
     sudo sh -c 'echo "overlays=spi3-m0-cs0-spidev uart2-m0 uart9-m2" >> /boot/orangepiEnv.txt'
 fi
@@ -383,6 +454,7 @@ fi
 #不要直接拔电，可能造成文件拷贝不完整，要用命令行重启，或者用sync将缓存同步到硬盘
 sync #把所有数据从内存缓冲区同步到硬盘
 reboot
+
 ```
 
 
@@ -396,9 +468,10 @@ reboot
 ```shell
 #!/bin/sh -e
 
+create_ap --fix-unmanaged #关闭热点
+
 play /home/orangepi/newbot_ws/src/audio/scripts/sound/boot.mp3
 
-sudo chmod 777 /sys/class/gpio/export
 sudo chmod 777 /dev/spidev3.0
 sudo chmod 777 /sys/class/gpio/export
 echo 128 > /sys/class/gpio/export
@@ -409,7 +482,8 @@ sudo chmod 777 /sys/class/gpio/gpio130/value
 sudo chmod 777 /sys/class/gpio/gpio130/direction
 gpio mode 20 out && gpio write 20 0
 
-su - orangepi -c "cd /home/orangepi/newbot_ws/src/config && bash start.sh > start.log &"
+su - orangepi -c "mkdir -p /home/orangepi/.ros"
+su - orangepi -c "cd /home/orangepi/newbot_ws/src/config && bash start.sh > /home/orangepi/.ros/start.log &"
 
 exit 0
 
@@ -422,12 +496,14 @@ exit 0
 wifi_ssid=$(nmcli connection show | grep wifi | awk '{print $1}')
 if [ -z "$wifi_ssid" ]; then
     echo "系统没有存储任何WIFI密码"
-    host_ip=$(hostname -I | awk '{print $1}')
+    #host_ip=$(hostname -I | awk '{print $1}')
+    host_ip=$(hostname -I | awk '{print $1}' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+') #只采用IPv4地址
 else
     echo "系统中保存有WIFI密码"
-    # 尝试获取IP地址
-    for cnt in $(seq 1 10); do  
-        host_ip=$(hostname -I | awk '{print $1}')
+    # 尝试获取IP地址15秒
+    for cnt in $(seq 1 15); do
+        #host_ip=$(hostname -I | awk '{print $1}')
+        host_ip=$(hostname -I | awk '{print $1}' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+') #只采用IPv4地址
         if [ -z "$host_ip" ]; then
             echo "尝试第$cnt次获取IP地址失败，等待1秒后重试"  
             sleep 1
@@ -447,19 +523,35 @@ if [ -z "$host_ip" ]; then
     echo "AP模式已开启，IP地址: $host_ip"
     play /home/orangepi/newbot_ws/src/audio/scripts/sound/ap.mp3
 fi
+
+
 export ROS_IP=$host_ip
 export ROS_HOSTNAME=$host_ip
 export ROS_MASTER_URI=http://$host_ip:11311
+#注意事项：这里如果雷达顶部有两颗螺丝，则设置为YDLIDAR；如果雷达顶部有三颗螺丝，则设置为M1C1_MINI
+#这个配置要在.bashrc中也要配置一遍，并且配置要一致
+#export LIDAR_TYPE=YDLIDAR
+export LIDAR_TYPE=M1C1_MINI
+
 source /opt/ros/noetic/setup.sh
 source /home/orangepi/newbot_ws/devel/setup.sh
 sleep 3 #等待3秒，防止网络不稳定引起的ROS启动错误
+
+#为解决重启后声卡可能丢失的问题，重新打开一下pulseaudio
+systemctl --user stop pulseaudio.socket
+systemctl --user stop pulseaudio.service
+systemctl --user start pulseaudio.socket
+systemctl --user start pulseaudio.service
+
 #设置默认的麦克风设备为USB麦克风
 pactl set-default-source "alsa_input.usb-C-Media_Electronics_Inc._USB_PnP_Sound_Device-00.mono-fallback"
-#麦克风接收增益调到100%
-amixer -c 2 sset Mic 100%
-cd /home/orangepi/newbot_ws
+#麦克风接收增益调到100%，范围0~16
+amixer -c 2 sset Mic 16
+
+#启动all.launch
 play /home/orangepi/newbot_ws/src/audio/scripts/sound/launch.mp3
-roslaunch pkg_launch all.launch
+roslaunch pkg_launch all.launch #如果启动失败，请查看~/.ros/log/latest/*.log，~/.ros/start.log等log文件
+
 ```
 
 
