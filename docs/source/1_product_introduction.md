@@ -2,6 +2,8 @@
 
 [https://newbot.readthedocs.io](https://newbot.readthedocs.io)
 
+备用地址：[https://gitee.com/cv-robot/newbot/tree/master/readthedocs](https://gitee.com/cv-robot/newbot/tree/master/readthedocs)
+
 
 
 # 嘉立创硬件开源
