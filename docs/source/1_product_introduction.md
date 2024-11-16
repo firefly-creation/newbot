@@ -1,3 +1,25 @@
+# 项目主页
+
+https://newbot.readthedocs.io
+
+
+
+# 嘉立创硬件开源
+
+https://oshwhub.com/lw95/newbot
+
+
+
+# gitee软件开源
+
+https://gitee.com/cv-robot/newbot
+
+
+
+# **B站视频链接**
+
+[电饭锅们出来军训了ʕ ᵔᴥᵔ ʔ](https://www.bilibili.com/video/BV1TTDBYnE8H)
+
 
 
 # 购买链接

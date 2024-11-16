@@ -1,7 +1,3 @@
-# **B站视频链接**
-
-[电饭锅们出来军训了ʕ ᵔᴥᵔ ʔ](https://www.bilibili.com/video/BV1TTDBYnE8H)
-
 # 一、项目背景
 
 ![xiaobai2](imgs/xiaobai2.jpg)
