@@ -18,7 +18,9 @@
 
 
 
-# **B站视频链接**
+# B站视频链接
+
+[【开源】如何手工打造一台理想中的机器人？](https://www.bilibili.com/video/BV1LWUYYjEUg)
 
 [电饭锅们出来军训了ʕ ᵔᴥᵔ ʔ](https://www.bilibili.com/video/BV1TTDBYnE8H)
 
