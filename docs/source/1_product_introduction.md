@@ -20,8 +20,6 @@
 
 
 
-
-
 # 产品外观
 
 ![xiaobai1](imgs/xiaobai1.jpg)
@@ -90,11 +88,7 @@
 
 # 主要软件功能
 
-
-
 ![software](imgs/software.png)
-
-注：Edge TTS语音合成因网络问题暂无法使用，目前适配了Espeak、Kaldi免费离线TTS以及三个免费的在线TTS，V1.0软件升级到V1.1即可。
 
 
 

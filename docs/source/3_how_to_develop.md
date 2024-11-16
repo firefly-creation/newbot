@@ -254,7 +254,7 @@ https://www.todesk.com/linux.html
 
 在开启了all.launch的情况下，另外打开一个终端，通过如下命令测试建图和导航效果。
 
-**注意：在测试建图之前需要把雷达调整到中速度或高速模式，离线语音命令为“雷达中速”、“雷达高速度”。**
+**注意：在测试建图之前需要打开雷达**
 
 ```shell
 cd ~/newbot_ws
@@ -262,7 +262,7 @@ source devel/setup.bash
 
 roslaunch robot_navigation blank_map_move_base.launch #空地图下测试路径规划(map坐标系和odom坐标系永远一致)
 
-#先让雷达进入高速模式
+#先要打开雷达
 roslaunch robot_navigation robot_slam.launch #SLAM建图测试
 
 cd maps && rosrun map_server map_saver -f map #进入robot_navigation包里的maps目录，执行map_server保存地图
