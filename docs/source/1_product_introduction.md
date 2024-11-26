@@ -1,3 +1,9 @@
+# 购买链接
+
+淘宝：[萤火虫创想 https://shop168302802.taobao.com](https://shop168302802.taobao.com) 
+
+
+
 # 项目主页
 
 [https://newbot.readthedocs.io](https://newbot.readthedocs.io)
